@@ -1,9 +1,16 @@
-import * as express from "express";
+import { Response } from "express";
 import { format } from "util";
 
 interface OptionsInterface {
   unsafe?: boolean;
 }
+
+interface Request {
+  flash: Function,
+  session: {},
+}
+
+type Message = string | {} | Record<string, string>[];
 
 /**
  * Expose `flash()` function on requests.
@@ -12,17 +19,16 @@ interface OptionsInterface {
  * @api public
  */
 module.exports = function flash(options: OptionsInterface): Function {
+  console.log("exports options", options);
   const safe = options.unsafe === undefined ? true : !options.unsafe;
 
-  return function (
-    req: express.Request,
-    res: express.Response,
-    next: Function
-  ) {
+  return function (req: Request, res: Response, next: Function) {
     if (req.flash && safe) {
       return next();
     }
+
     req.flash = _flash;
+
     next();
   };
 };
@@ -56,12 +62,12 @@ module.exports = function flash(options: OptionsInterface): Function {
  *
  * Formatting uses `util.format()`, which is available on Node 0.6+.
  *
- * @param {String} type
- * @param {String} msg
- * @return {Array|Object|Number}
+ * @param type
+ * @param msg
+ * @return
  * @api public
  */
-function _flash(type?: string, msg?: any) {
+function _flash(type?: string, msg?: Message) {
   if (this.session === undefined) {
     throw Error("req.flash() requires sessions");
   }
@@ -69,19 +75,18 @@ function _flash(type?: string, msg?: any) {
   var msgs = (this.session.flash = this.session.flash || {});
 
   if (type && msg) {
-    // util.format is available in Node.js 0.6+
     if (arguments.length > 2) {
-      var args = Array.prototype.slice.call(arguments, 1);
+      const args = Array.prototype.slice.call(arguments, 1);
       msg = format.apply(undefined, args);
     } else if (Array.isArray(msg)) {
       msg.forEach(function (val) {
         (msgs[type] = msgs[type] || []).push(val);
       });
-      return msgs[type].length;
+      // return msgs[type]?.length;
     }
     return (msgs[type] = msgs[type] || []).push(msg);
   } else if (type) {
-    var arr = msgs[type];
+    const arr = msgs[type];
     delete msgs[type];
     return arr || [];
   } else {
