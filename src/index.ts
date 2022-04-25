@@ -1,9 +1,9 @@
-/**
- * Module dependencies.
- */
-var format = require('util').format;
-var isArray = require('util').isArray;
+import * as express from "express";
+import { format } from "util";
 
+interface OptionsInterface {
+  unsafe?: boolean;
+}
 
 /**
  * Expose `flash()` function on requests.
@@ -11,16 +11,21 @@ var isArray = require('util').isArray;
  * @return {Function}
  * @api public
  */
-module.exports = function flash(options) {
-  options = options || {};
-  var safe = (options.unsafe === undefined) ? true : !options.unsafe;
-  
-  return function(req, res, next) {
-    if (req.flash && safe) { return next(); }
+module.exports = function flash(options: OptionsInterface): Function {
+  const safe = options.unsafe === undefined ? true : !options.unsafe;
+
+  return function (
+    req: express.Request,
+    res: express.Response,
+    next: Function
+  ) {
+    if (req.flash && safe) {
+      return next();
+    }
     req.flash = _flash;
     next();
-  }
-}
+  };
+};
 
 /**
  * Queue flash `msg` of the given `type`.
@@ -56,16 +61,20 @@ module.exports = function flash(options) {
  * @return {Array|Object|Number}
  * @api public
  */
-function _flash(type, msg) {
-  if (this.session === undefined) throw Error('req.flash() requires sessions');
-  var msgs = this.session.flash = this.session.flash || {};
+function _flash(type?: string, msg?: any) {
+  if (this.session === undefined) {
+    throw Error("req.flash() requires sessions");
+  }
+
+  var msgs = (this.session.flash = this.session.flash || {});
+
   if (type && msg) {
     // util.format is available in Node.js 0.6+
-    if (arguments.length > 2 && format) {
+    if (arguments.length > 2) {
       var args = Array.prototype.slice.call(arguments, 1);
       msg = format.apply(undefined, args);
-    } else if (isArray(msg)) {
-      msg.forEach(function(val){
+    } else if (Array.isArray(msg)) {
+      msg.forEach(function (val) {
         (msgs[type] = msgs[type] || []).push(val);
       });
       return msgs[type].length;
