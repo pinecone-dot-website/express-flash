@@ -18,7 +18,7 @@ type Message = string | {} | Record<string, string>[];
  * @return {Function}
  * @api public
  */
-module.exports = function flash(options: OptionsInterface): Function {
+module.exports = function flash(options: OptionsInterface = {}): Function {
   console.log("exports options", options);
   const safe = options.unsafe === undefined ? true : !options.unsafe;
 
