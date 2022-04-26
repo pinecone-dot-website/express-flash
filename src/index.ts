@@ -5,11 +5,6 @@ interface OptionsInterface {
   unsafe?: boolean;
 }
 
-interface Request {
-  flash: Function,
-  session: {},
-}
-
 type Message = string | {} | Record<string, string>[];
 
 /**

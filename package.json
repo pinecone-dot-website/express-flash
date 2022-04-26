@@ -1,7 +1,7 @@
 {
-  "name": "connect-flash",
-  "version": "0.1.1",
-  "description": "Flash message middleware for Connect.",
+  "name": "@rackandpinecone/express-flash",
+  "version": "0.1.2",
+  "description": "Flash message middleware for Express",
   "keywords": [
     "connect",
     "express",
@@ -14,11 +14,6 @@
   },
   "bugs": {
     "url": "https://github.com/pinecone-dot-website/express-flash/issues"
-  },
-  "author": {
-    "name": "Jared Hanson",
-    "email": "jaredhanson@gmail.com",
-    "url": "http://www.jaredhanson.net/"
   },
   "licenses": [
     {
