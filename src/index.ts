@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { NextFunction, Response } from "express";
 import { format } from "util";
 
 interface OptionsInterface {
@@ -14,15 +14,14 @@ type Message = string | {} | Record<string, string>[];
  * @api public
  */
 module.exports = function flash(options: OptionsInterface = {}): Function {
-  console.log("exports options", options);
   const safe = options.unsafe === undefined ? true : !options.unsafe;
 
-  return function (req: Request, res: Response, next: Function) {
+  return function (req: Express.Request, res: Response, next: NextFunction) {
     if (req.flash && safe) {
       return next();
     }
 
-    req.flash = _flash;
+    req.flash = _flash.bind(req);
 
     next();
   };
@@ -62,7 +61,7 @@ module.exports = function flash(options: OptionsInterface = {}): Function {
  * @return
  * @api public
  */
-function _flash(type?: string, msg?: Message) {
+function _flash(this: any, type?: string, msg?: Message) {
   if (this.session === undefined) {
     throw Error("req.flash() requires sessions");
   }
@@ -77,15 +76,19 @@ function _flash(type?: string, msg?: Message) {
       msg.forEach(function (val) {
         (msgs[type] = msgs[type] || []).push(val);
       });
-      // return msgs[type]?.length;
+
+      console.log('msgs[type]', type, msgs[type]);
     }
+
     return (msgs[type] = msgs[type] || []).push(msg);
   } else if (type) {
     const arr = msgs[type];
     delete msgs[type];
+
     return arr || [];
   } else {
     this.session.flash = {};
+
     return msgs;
   }
 }

@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
+    "declaration": true,
     "target": "es5",
     "module": "commonjs",
-    "declaration": true,
     "outDir": "./lib",
+    "sourceMap": true,
     "strict": true
   },
   "files": ["./types/request.d.ts", "./src/index.ts"]
